@@ -18,3 +18,18 @@ migrations_dir = "../../drizzle"
 [[routes]]
 pattern = "wishlist.kurichi.dev"
 custom_domain = true
+
+[observability]
+enabled = true
+head_sampling_rate = 1
+
+[observability.logs]
+enabled = true
+head_sampling_rate = 1
+persist = true
+invocation_logs = true
+
+[observability.traces]
+enabled = true
+persist = true
+head_sampling_rate = 1
