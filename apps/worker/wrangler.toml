@@ -2,6 +2,7 @@ name = "wishlist"
 main = "src/index.ts"
 compatibility_date = "2025-01-01"
 account_id = "f0069a1fae852d87a68351debdb6991c"
+preview_urls = false
 
 [assets]
 directory = "../web/dist"
