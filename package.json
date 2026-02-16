@@ -1,0 +1,26 @@
+{
+  "name": "wishlist",
+  "private": true,
+  "scripts": {
+    "dev:api": "pnpm --filter @wishlist/api dev",
+    "dev:web": "pnpm --filter @wishlist/web dev",
+    "dev:mcp": "pnpm --filter @wishlist/mcp dev",
+    "build": "pnpm --filter @wishlist/core build && pnpm --filter './apps/*' build",
+    "build:core": "pnpm --filter @wishlist/core build",
+    "build:api": "pnpm --filter @wishlist/api build",
+    "build:mcp": "pnpm --filter @wishlist/mcp build",
+    "build:web": "pnpm --filter @wishlist/web build",
+    "deploy:api": "pnpm --filter @wishlist/api run deploy",
+    "deploy:mcp": "pnpm --filter @wishlist/mcp run deploy",
+    "deploy:web": "pnpm --filter @wishlist/web run deploy",
+    "db:generate": "pnpm --filter @wishlist/core db:generate",
+    "db:migrate:local": "pnpm --filter @wishlist/api db:migrate:local",
+    "db:migrate:remote": "pnpm --filter @wishlist/api db:migrate:remote",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "pnpm -r lint"
+  },
+  "packageManager": "pnpm@10.4.1",
+  "engines": {
+    "node": ">=20"
+  }
+}
