@@ -1,25 +1,25 @@
 {
-  "name": "@wishlist/api",
+  "name": "@wishlist/worker",
   "version": "0.0.1",
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "wrangler dev",
-    "build": "wrangler deploy --dry-run --outdir=dist",
+    "dev": "mkdir -p ../web/dist && wrangler dev",
+    "build": "mkdir -p ../web/dist && wrangler deploy --dry-run --outdir=dist",
     "deploy": "wrangler deploy",
-    "typecheck": "NODE_OPTIONS='--max-old-space-size=8192' tsc --noEmit",
+    "typecheck": "tsc --noEmit",
     "db:migrate:local": "wrangler d1 migrations apply wishlist-db --local",
     "db:migrate:remote": "wrangler d1 migrations apply wishlist-db --remote"
   },
   "dependencies": {
     "hono": "^4",
     "@hono/zod-validator": "^0.4",
+    "workers-mcp": "^0.0.13",
     "@wishlist/core": "workspace:*",
     "drizzle-orm": "^0.39"
   },
   "devDependencies": {
-    "wrangler": "^4",
-    "@cloudflare/workers-types": "^4",
+    "wrangler": "^4.20.0",
     "typescript": "^5.7"
   }
 }

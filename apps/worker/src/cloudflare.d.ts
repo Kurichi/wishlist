@@ -53,6 +53,7 @@ declare module 'cloudflare:workers' {
 interface ExecutionContext {
   waitUntil(promise: Promise<unknown>): void;
   passThroughOnException(): void;
+  props: Record<string, unknown>;
 }
 
 interface DurableObjectState {
@@ -74,4 +75,8 @@ interface DurableObjectStorage {
   delete(key: string): Promise<boolean>;
   delete(keys: string[]): Promise<number>;
   list<T = unknown>(options?: { start?: string; end?: string; prefix?: string; reverse?: boolean; limit?: number }): Promise<Map<string, T>>;
+}
+
+interface Fetcher {
+  fetch(input: RequestInfo, init?: RequestInit): Promise<Response>;
 }
