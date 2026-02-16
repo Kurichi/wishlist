@@ -1,13 +1,19 @@
-name = "wishlist-api"
+name = "wishlist"
 main = "src/index.ts"
 compatibility_date = "2025-01-01"
 account_id = "f0069a1fae852d87a68351debdb6991c"
 
-[vars]
-ALLOWED_ORIGINS = "http://localhost:5173,https://wishlist-web-bjs.pages.dev"
+[assets]
+directory = "../web/dist"
+not_found_handling = "single-page-application"
+run_worker_first = ["/api/*", "/rpc", "/health"]
 
 [[d1_databases]]
 binding = "DB"
 database_name = "wishlist-db"
 database_id = "14f7e4d2-4afb-472f-becd-97dd7153cb74"
 migrations_dir = "../../drizzle"
+
+[[routes]]
+pattern = "wishlist.kurichi.dev"
+custom_domain = true

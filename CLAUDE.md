@@ -4,39 +4,35 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## プロジェクト概要
 
-ほしい物リスト管理 Web アプリ。Cloudflare フルスタック (Workers + Pages + D1) + MCP サーバー。
+ほしい物リスト管理 Web アプリ。Cloudflare Workers (単一 Worker) + D1 + MCP サーバー。
 
 ## 技術スタック
 
 - **言語:** TypeScript
 - **パッケージマネージャ:** pnpm (workspace monorepo)
 - **API:** Hono on Cloudflare Workers
-- **MCP:** workers-mcp SDK on Cloudflare Workers
+- **MCP:** workers-mcp SDK (ProxyToSelf)
 - **DB:** Cloudflare D1 (SQLite) + Drizzle ORM
 - **Frontend:** React 19 + Vite + Tailwind CSS v4 + shadcn/ui
 - **IaC:** Terraform (Cloudflare Provider)
 
 ## モノレポ構成
 
-- `apps/api` - REST API Worker (Hono)
-- `apps/mcp` - MCP サーバー Worker
-- `apps/web` - フロントエンド SPA
+- `apps/worker` - 統合 Worker (API + MCP + Static Assets)
+- `apps/web` - フロントエンド SPA (ビルドのみ、Worker が配信)
 - `packages/core` - 共有ライブラリ (Drizzle スキーマ, 型, バリデーション, リポジトリ)
 
 ## コマンド
 
 ### 開発
 
-pnpm dev:api    # API Worker ローカル起動 (wrangler dev)
-pnpm dev:web    # フロントエンド dev サーバー (vite)
-pnpm dev:mcp    # MCP Worker ローカル起動
+pnpm dev:worker   # Worker ローカル起動 (API + MCP)
+pnpm dev:web      # フロントエンド dev サーバー (Vite、/api は Worker にプロキシ)
 
 ### ビルド・デプロイ
 
-pnpm build              # 全パッケージビルド
-pnpm deploy:api         # API Worker デプロイ
-pnpm deploy:mcp         # MCP Worker デプロイ
-pnpm deploy:web         # Pages デプロイ
+pnpm build              # 全パッケージビルド (core → web → worker)
+pnpm deploy             # Worker デプロイ (wishlist.kurichi.dev)
 
 ### データベース
 
@@ -46,12 +42,25 @@ pnpm db:migrate:remote  # リモート D1 マイグレーション
 
 ## アーキテクチャ
 
+### URL 構成
+
+```
+wishlist.kurichi.dev (単一 Worker)
+├── /api/*    → Hono REST API
+├── /rpc      → workers-mcp (ProxyToSelf)
+├── /health   → ヘルスチェック
+└── /*        → Static Assets (React SPA)
+```
+
 ### データフロー
 
-Frontend (React) → REST API (Hono Worker) → D1
-Claude (MCP)     → MCP Server (Worker)     → D1
+```
+Frontend (React) ─┐
+                   ├→ Worker (wishlist.kurichi.dev) → D1
+Claude (MCP)    ──┘
+```
 
-両 Worker は同一の D1 データベースにバインドし、`@wishlist/core` の WishlistRepository (Drizzle ベース) を共有する。
+単一 Worker が REST API (/api/*)、MCP (/rpc)、静的アセット配信を担当。
 
 ### DB スキーマ管理
 

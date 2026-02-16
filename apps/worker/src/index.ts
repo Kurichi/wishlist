@@ -1,5 +1,6 @@
 import { WorkerEntrypoint } from 'cloudflare:workers';
 import { ProxyToSelf } from 'workers-mcp';
+import { app } from './api.js';
 import {
   createDb,
   WishlistRepository,
@@ -18,7 +19,7 @@ interface Env {
   SHARED_SECRET: string;
 }
 
-export default class WishlistMCP extends WorkerEntrypoint<Env> {
+export default class WishlistWorker extends WorkerEntrypoint<Env> {
   /**
    * List and filter wishlist items. Returns all items matching the given filters.
    *
@@ -176,10 +177,16 @@ export default class WishlistMCP extends WorkerEntrypoint<Env> {
     return JSON.stringify(summary, null, 2);
   }
 
-  /**
-   * @ignore
-   */
+  /** @ignore */
   async fetch(request: Request): Promise<Response> {
-    return new ProxyToSelf(this).fetch(request);
+    const url = new URL(request.url);
+
+    // MCP: /rpc は ProxyToSelf で処理 (SHARED_SECRET で認証)
+    if (url.pathname === '/rpc') {
+      return new ProxyToSelf(this).fetch(request);
+    }
+
+    // API + Health: Hono で処理
+    return app.fetch(request, this.env, this.ctx);
   }
 }

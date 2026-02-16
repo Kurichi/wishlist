@@ -1,3 +1,5 @@
+/// <reference path="./cloudflare.d.ts" />
+
 export { wishlistItems } from './db/schema.js';
 export { createDb } from './db/index.js';
 export type { Database } from './db/index.js';

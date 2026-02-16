@@ -1,9 +1,0 @@
-name = "wishlist-mcp"
-main = "src/index.ts"
-compatibility_date = "2025-01-01"
-account_id = "f0069a1fae852d87a68351debdb6991c"
-
-[[d1_databases]]
-binding = "DB"
-database_name = "wishlist-db"
-database_id = "14f7e4d2-4afb-472f-becd-97dd7153cb74"

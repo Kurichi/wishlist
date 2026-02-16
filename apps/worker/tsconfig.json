@@ -1,17 +1,12 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "jsx": "react-jsx",
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["./src/*"]
-    },
+    "outDir": "dist",
     "noEmit": true,
     "allowImportingTsExtensions": true,
     "moduleDetection": "force",
     "verbatimModuleSyntax": false,
-    "types": ["vite/client"]
+    "lib": ["ES2022", "DOM", "DOM.Iterable"]
   },
   "include": ["src"]
 }
