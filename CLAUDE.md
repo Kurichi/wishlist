@@ -34,6 +34,13 @@ pnpm dev:web      # フロントエンド dev サーバー (Vite、/api は Work
 pnpm build              # 全パッケージビルド (core → web → worker)
 pnpm deploy             # Worker デプロイ (wishlist.kurichi.dev)
 
+### CI/CD
+
+Cloudflare Workers Builds (Git 連携) を使用。main ブランチへの push で自動デプロイ。
+Dashboard 側の設定:
+- Build command: `pnpm install --frozen-lockfile && pnpm typecheck && pnpm build:core && pnpm build:web && pnpm build:worker`
+- Deploy command: `cd apps/worker && pnpm db:migrate:remote && pnpm deploy`
+
 ### データベース
 
 pnpm db:generate        # Drizzle スキーマから SQL マイグレーション生成
