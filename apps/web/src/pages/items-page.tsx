@@ -9,6 +9,8 @@ import { ItemList } from '@/components/items/item-list';
 import { ItemDialog } from '@/components/items/item-dialog';
 import { ItemSheet } from '@/components/items/item-sheet';
 import { ItemDeleteDialog } from '@/components/items/item-delete-dialog';
+import { ItemDetailDialog } from '@/components/items/item-detail-dialog';
+import { ItemDetailSheet } from '@/components/items/item-detail-sheet';
 import type { ItemFormData } from '@/components/items/item-form';
 import { Button } from '@/components/ui/button';
 import { useItems } from '@/hooks/use-items';
@@ -27,6 +29,7 @@ export function ItemsPage() {
   const [formOpen, setFormOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<WishlistItem | undefined>();
   const [deletingItem, setDeletingItem] = useState<WishlistItem | undefined>();
+  const [viewingItem, setViewingItem] = useState<WishlistItem | undefined>();
 
   const items = data?.items ?? [];
 
@@ -36,12 +39,17 @@ export function ItemsPage() {
   };
 
   const handleEdit = (item: WishlistItem) => {
+    setViewingItem(undefined);
     setEditingItem(item);
     setFormOpen(true);
   };
 
   const handleDelete = (item: WishlistItem) => {
     setDeletingItem(item);
+  };
+
+  const handleView = (item: WishlistItem) => {
+    setViewingItem(item);
   };
 
   const handleFormSubmit = (formData: ItemFormData) => {
@@ -97,6 +105,7 @@ export function ItemsPage() {
           isLoading={isLoading}
           onEdit={handleEdit}
           onDelete={handleDelete}
+          onView={handleView}
         />
       </main>
 
@@ -109,7 +118,7 @@ export function ItemsPage() {
         <Plus className="h-6 w-6" />
       </Button>
 
-      {/* Desktop: Dialog / Mobile: Sheet */}
+      {/* Desktop: Dialog / Mobile: Sheet for form */}
       {isDesktop ? (
         <ItemDialog
           open={formOpen}
@@ -125,6 +134,27 @@ export function ItemsPage() {
           item={editingItem}
           onSubmit={handleFormSubmit}
           isSubmitting={isSubmitting}
+        />
+      )}
+
+      {/* Desktop: Dialog / Mobile: Sheet for detail view */}
+      {isDesktop ? (
+        <ItemDetailDialog
+          open={!!viewingItem}
+          onOpenChange={(open) => {
+            if (!open) setViewingItem(undefined);
+          }}
+          item={viewingItem}
+          onEdit={handleEdit}
+        />
+      ) : (
+        <ItemDetailSheet
+          open={!!viewingItem}
+          onOpenChange={(open) => {
+            if (!open) setViewingItem(undefined);
+          }}
+          item={viewingItem}
+          onEdit={handleEdit}
         />
       )}
 

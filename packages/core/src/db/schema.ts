@@ -8,6 +8,7 @@ export const wishlistItems = sqliteTable('wishlist_items', {
   budget: integer('budget'),
   priority: text('priority', { enum: ['high', 'medium', 'low'] }).notNull(),
   status: text('status', { enum: ['unstarted', 'considering', 'purchased'] }).notNull().default('unstarted'),
+  desireType: text('desire_type', { enum: ['specific-product', 'general-image', 'problem-to-solve'] }).notNull().default('general-image'),
   memo: text('memo'),
   createdAt: text('created_at').notNull(),
   updatedAt: text('updated_at').notNull(),

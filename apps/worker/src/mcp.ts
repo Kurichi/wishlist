@@ -32,18 +32,22 @@ export function createMcpServer(env: { DB: D1Database }) {
         .enum(["unstarted", "considering", "purchased"])
         .optional(),
       priority: z.enum(["high", "medium", "low"]).optional(),
+      desireType: z
+        .enum(["specific-product", "general-image", "problem-to-solve"])
+        .optional(),
       sort: z
         .enum(["name", "createdAt", "updatedAt", "budget", "priority"])
         .optional(),
       order: z.enum(["asc", "desc"]).optional(),
     },
-    async ({ timeframe, category, status, priority, sort, order }) => {
+    async ({ timeframe, category, status, priority, desireType, sort, order }) => {
       const repo = getRepo();
       const items = await repo.list({
         timeframe,
         category,
         status,
         priority,
+        desireType,
         sort,
         order,
       });
@@ -94,13 +98,17 @@ export function createMcpServer(env: { DB: D1Database }) {
         .enum(["high", "medium", "low"])
         .describe("Priority level"),
       budget: z.number().int().nonnegative().nullable().optional().describe("Optional budget amount"),
-      memo: z.string().max(2000).nullable().optional().describe("Optional memo"),
+      desireType: z
+        .enum(["specific-product", "general-image", "problem-to-solve"])
+        .optional()
+        .describe("ほしさの方向: specific-product(具体的な商品), general-image(イメージ), problem-to-solve(課題)"),
+      memo: z.string().max(10000).nullable().optional().describe("Optional memo (supports Markdown)"),
       status: z
         .enum(["unstarted", "considering", "purchased"])
         .optional()
         .describe("Status (defaults to unstarted)"),
     },
-    async ({ name, timeframe, category, priority, budget, memo, status }) => {
+    async ({ name, timeframe, category, priority, budget, desireType, memo, status }) => {
       try {
         const repo = getRepo();
         const parsed = createItemSchema.parse({
@@ -109,6 +117,7 @@ export function createMcpServer(env: { DB: D1Database }) {
           category,
           priority,
           budget: budget ?? null,
+          desireType: desireType ?? undefined,
           memo: memo ?? null,
           status: status ?? undefined,
         });
@@ -149,13 +158,17 @@ export function createMcpServer(env: { DB: D1Database }) {
         .optional()
         .describe("Updated priority"),
       budget: z.number().int().nonnegative().nullable().optional().describe("Updated budget (null to clear)"),
-      memo: z.string().max(2000).nullable().optional().describe("Updated memo (null to clear)"),
+      desireType: z
+        .enum(["specific-product", "general-image", "problem-to-solve"])
+        .optional()
+        .describe("Updated desire type"),
+      memo: z.string().max(10000).nullable().optional().describe("Updated memo (supports Markdown, null to clear)"),
       status: z
         .enum(["unstarted", "considering", "purchased"])
         .optional()
         .describe("Updated status"),
     },
-    async ({ id, name, timeframe, category, priority, budget, memo, status }) => {
+    async ({ id, name, timeframe, category, priority, budget, desireType, memo, status }) => {
       try {
         const repo = getRepo();
         const updateData: Record<string, unknown> = {};
@@ -164,6 +177,7 @@ export function createMcpServer(env: { DB: D1Database }) {
         if (category !== undefined) updateData.category = category;
         if (priority !== undefined) updateData.priority = priority;
         if (budget !== undefined) updateData.budget = budget;
+        if (desireType !== undefined) updateData.desireType = desireType;
         if (memo !== undefined) updateData.memo = memo;
         if (status !== undefined) updateData.status = status;
 

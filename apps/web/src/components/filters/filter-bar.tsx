@@ -13,6 +13,7 @@ import {
   CATEGORY_OPTIONS,
   STATUS_OPTIONS,
   PRIORITY_OPTIONS,
+  DESIRE_TYPE_OPTIONS,
 } from '@/lib/constants';
 import type { ItemFilters } from '@/api/items';
 
@@ -26,11 +27,17 @@ export function FilterBar({ filters, onFilterChange, onClear }: FilterBarProps) 
   const [expanded, setExpanded] = useState(false);
 
   const hasActiveFilters = !!(
-    filters.timeframe || filters.category || filters.status || filters.priority
+    filters.timeframe || filters.category || filters.status || filters.priority || filters.desireType
   );
 
   const filterSelects = (
     <div className="flex flex-wrap gap-2">
+      <FilterSelect
+        placeholder="方向"
+        options={DESIRE_TYPE_OPTIONS}
+        value={filters.desireType}
+        onChange={(v) => onFilterChange('desireType', v)}
+      />
       <FilterSelect
         placeholder="期間"
         options={TIMEFRAME_OPTIONS}

@@ -7,7 +7,7 @@ import {
   updateItemSchema,
   NotFoundError,
 } from '@wishlist/core';
-import type { Timeframe, Category, Status, Priority } from '@wishlist/core';
+import type { Timeframe, Category, Status, Priority, DesireType } from '@wishlist/core';
 
 type Env = { Bindings: { DB: D1Database } };
 
@@ -22,6 +22,7 @@ items.get('/', async (c) => {
     category: c.req.query('category') as Category | undefined,
     status: c.req.query('status') as Status | undefined,
     priority: c.req.query('priority') as Priority | undefined,
+    desireType: c.req.query('desireType') as DesireType | undefined,
     sort: c.req.query('sort') as 'name' | 'createdAt' | 'updatedAt' | 'budget' | 'priority' | undefined,
     order: c.req.query('order') as 'asc' | 'desc' | undefined,
   };
