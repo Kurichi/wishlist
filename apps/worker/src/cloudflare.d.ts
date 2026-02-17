@@ -144,5 +144,6 @@ interface Env {
   DB: D1Database;
   OAUTH_KV: KVNamespace;
   API_TOKEN: string;
+  APPROVE_PASSWORD: string;
   OAUTH_PROVIDER: OAuthHelpers;
 }

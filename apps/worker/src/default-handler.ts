@@ -33,6 +33,15 @@ function isAllowedRedirectUri(uri: string): boolean {
   }
 }
 
+function verifyPassword(input: string, expected: string): boolean {
+  const a = new TextEncoder().encode(input);
+  const b = new TextEncoder().encode(expected);
+  let diff = a.length ^ b.length;
+  const n = Math.max(a.length, b.length);
+  for (let i = 0; i < n; i++) diff |= (a[i] ?? 0) ^ (b[i] ?? 0);
+  return diff === 0;
+}
+
 export const defaultHandler = {
   async fetch(
     request: Request,
@@ -71,8 +80,6 @@ export const defaultHandler = {
     }
 
     // POST /authorize — handle approval/denial
-    // Security: /authorize is protected by Cloudflare Access (owner-only policy).
-    // See deployment notes for Access rule configuration.
     if (pathname === "/authorize" && request.method === "POST") {
       const formData = await request.formData();
       const action = formData.get("action") as string;
@@ -121,6 +128,16 @@ export const defaultHandler = {
           redirectUrl.searchParams.set("state", oauthReqInfo.state);
         }
         return Response.redirect(redirectUrl.toString(), 302);
+      }
+
+      // Verify password before granting authorization
+      const password = String(formData.get("password") ?? "");
+      const expected = env.APPROVE_PASSWORD?.trim();
+      if (!expected) {
+        return new Response("Server misconfigured: APPROVE_PASSWORD not set", { status: 500 });
+      }
+      if (!verifyPassword(password, expected)) {
+        return renderAuthorizePage(clientInfo, oauthReqInfo, "パスワードが正しくありません");
       }
 
       const { redirectTo } = await env.OAUTH_PROVIDER.completeAuthorization({

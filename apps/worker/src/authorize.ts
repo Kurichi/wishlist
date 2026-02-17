@@ -10,6 +10,7 @@ function escapeHtml(str: string): string {
 export function renderAuthorizePage(
   clientInfo: OAuthClientInfo,
   oauthReqInfo: OAuthRequestInfo,
+  error?: string,
 ): Response {
   const clientName = escapeHtml(
     clientInfo.clientName || oauthReqInfo.clientId,
@@ -40,6 +41,11 @@ export function renderAuthorizePage(
     .approve:hover { background: #1d4ed8; }
     .deny { background: #e5e7eb; color: #374151; }
     .deny:hover { background: #d1d5db; }
+    .password-field { margin-top: 1rem; }
+    .password-field dt { font-weight: 600; color: #555; font-size: 0.875rem; }
+    .password-field input { width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.9375rem; margin-top: 0.25rem; }
+    .password-field input:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 2px rgba(37,99,235,0.2); }
+    .error { color: #dc2626; font-size: 0.875rem; margin-top: 0.5rem; }
   </style>
 </head>
 <body>
@@ -54,9 +60,13 @@ export function renderAuthorizePage(
     </dl>
     <form method="POST" action="/authorize">
       <input type="hidden" name="oauthReqInfo" value="${oauthReqBase64}" />
+      <div class="password-field">
+        <dt>承認パスワード</dt>
+        <input type="password" name="password" required autocomplete="off" placeholder="パスワードを入力" />
+      </div>${error ? `\n      <p class="error">${escapeHtml(error)}</p>` : ""}
       <div class="actions">
         <button type="submit" name="action" value="approve" class="approve">承認する</button>
-        <button type="submit" name="action" value="deny" class="deny">拒否する</button>
+        <button type="submit" name="action" value="deny" class="deny" formnovalidate>拒否する</button>
       </div>
     </form>
   </div>
