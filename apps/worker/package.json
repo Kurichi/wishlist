@@ -12,6 +12,7 @@
     "db:migrate:remote": "wrangler d1 migrations apply wishlist-db --remote"
   },
   "dependencies": {
+    "@cloudflare/workers-oauth-provider": "^0.2",
     "hono": "^4",
     "@hono/zod-validator": "^0.4",
     "@modelcontextprotocol/sdk": "^1.26.0",

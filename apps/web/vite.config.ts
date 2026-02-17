@@ -15,6 +15,10 @@ export default defineConfig({
       '/api': 'http://localhost:8787',
       '/mcp': 'http://localhost:8787',
       '/health': 'http://localhost:8787',
+      '/.well-known': 'http://localhost:8787',
+      '/authorize': 'http://localhost:8787',
+      '/token': 'http://localhost:8787',
+      '/register': 'http://localhost:8787',
     },
   },
 });

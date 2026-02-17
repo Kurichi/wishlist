@@ -80,3 +80,69 @@ interface DurableObjectStorage {
 interface Fetcher {
   fetch(input: RequestInfo, init?: RequestInit): Promise<Response>;
 }
+
+// KV Namespace
+interface KVNamespace {
+  get(key: string, options?: { type?: "text" }): Promise<string | null>;
+  get(key: string, options: { type: "json" }): Promise<unknown | null>;
+  get(key: string, options: { type: "arrayBuffer" }): Promise<ArrayBuffer | null>;
+  get(key: string, options: { type: "stream" }): Promise<ReadableStream | null>;
+  put(
+    key: string,
+    value: string | ArrayBuffer | ReadableStream,
+    options?: {
+      expiration?: number;
+      expirationTtl?: number;
+      metadata?: Record<string, unknown>;
+    },
+  ): Promise<void>;
+  delete(key: string): Promise<void>;
+  list(options?: {
+    prefix?: string;
+    limit?: number;
+    cursor?: string;
+  }): Promise<{
+    keys: { name: string; expiration?: number; metadata?: unknown }[];
+    list_complete: boolean;
+    cursor?: string;
+  }>;
+}
+
+// OAuth Provider helpers (injected by @cloudflare/workers-oauth-provider)
+interface OAuthRequestInfo {
+  clientId: string;
+  redirectUri: string;
+  scope: string[];
+  state: string;
+  codeChallenge?: string;
+  codeChallengeMethod?: string;
+  responseType: string;
+}
+
+interface OAuthClientInfo {
+  clientId: string;
+  clientName?: string;
+  redirectUris?: string[];
+  logoUri?: string;
+  clientUri?: string;
+}
+
+interface OAuthHelpers {
+  parseAuthRequest(request: Request): Promise<OAuthRequestInfo>;
+  lookupClient(clientId: string): Promise<OAuthClientInfo | null>;
+  completeAuthorization(options: {
+    request: OAuthRequestInfo;
+    userId: string;
+    metadata?: Record<string, unknown>;
+    scope: string[];
+    props: Record<string, unknown>;
+  }): Promise<{ redirectTo: string }>;
+}
+
+// Worker shared Env type
+interface Env {
+  DB: D1Database;
+  OAUTH_KV: KVNamespace;
+  API_TOKEN: string;
+  OAUTH_PROVIDER: OAuthHelpers;
+}
