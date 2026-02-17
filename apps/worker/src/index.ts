@@ -1,50 +1,31 @@
-import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
-import { app } from "./api.js";
-import { createMcpServer } from "./mcp.js";
+import { OAuthProvider } from "@cloudflare/workers-oauth-provider";
+import { McpHandler } from "./mcp-handler.js";
+import { defaultHandler } from "./default-handler.js";
 
-interface Env {
-  DB: D1Database;
-}
+export default new OAuthProvider({
+  apiRoute: ["/mcp", "/mcp/"],
+  apiHandler: McpHandler,
+  defaultHandler,
+  authorizeEndpoint: "/authorize",
+  tokenEndpoint: "/token",
+  clientRegistrationEndpoint: "/register",
+  scopesSupported: ["wishlist"],
+  accessTokenTTL: 3600,
+  refreshTokenTTL: 2592000,
+  allowImplicitFlow: false,
+  disallowPublicClientRegistration: false,
 
-const corsHeaders: Record<string, string> = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Access-Control-Allow-Headers":
-    "Content-Type, Accept, mcp-session-id, mcp-protocol-version",
-  "Access-Control-Expose-Headers": "mcp-session-id",
-  "Access-Control-Max-Age": "86400",
-};
-
-function withCors(response: Response): Response {
-  for (const [key, value] of Object.entries(corsHeaders)) {
-    response.headers.set(key, value);
-  }
-  return response;
-}
-
-export default {
-  async fetch(
-    request: Request,
-    env: Env,
-    ctx: ExecutionContext,
-  ): Promise<Response> {
-    const url = new URL(request.url);
-
-    if (url.pathname === "/mcp") {
-      if (request.method === "OPTIONS") {
-        return new Response(null, { headers: corsHeaders });
-      }
-      if (request.method !== "POST") {
-        return withCors(
-          new Response("Method Not Allowed", { status: 405 }),
-        );
-      }
-      const transport = new WebStandardStreamableHTTPServerTransport();
-      const server = createMcpServer(env);
-      await server.connect(transport);
-      return withCors(await transport.handleRequest(request));
-    }
-
-    return app.fetch(request, env, ctx);
+  async resolveExternalToken({ token, env }) {
+    const expected = (
+      (env as Record<string, unknown>).API_TOKEN as string | undefined
+    )?.trim();
+    if (!expected || !token || token.length !== expected.length) return null;
+    let diff = 0;
+    for (let i = 0; i < token.length; i++)
+      diff |= token.charCodeAt(i) ^ expected.charCodeAt(i);
+    if (diff !== 0) return null;
+    return { props: { userId: "owner" } };
   },
-};
+});
+
+export { McpHandler };
