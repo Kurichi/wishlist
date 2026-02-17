@@ -13,7 +13,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': 'http://localhost:8787',
-      '/rpc': 'http://localhost:8787',
+      '/mcp': 'http://localhost:8787',
       '/health': 'http://localhost:8787',
     },
   },

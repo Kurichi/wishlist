@@ -11,7 +11,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **言語:** TypeScript
 - **パッケージマネージャ:** pnpm (workspace monorepo)
 - **API:** Hono on Cloudflare Workers
-- **MCP:** workers-mcp SDK (ProxyToSelf)
+- **MCP:** @modelcontextprotocol/sdk (Streamable HTTP Transport)
 - **DB:** Cloudflare D1 (SQLite) + Drizzle ORM
 - **Frontend:** React 19 + Vite + Tailwind CSS v4 + shadcn/ui
 - **IaC:** Terraform (Cloudflare Provider)
@@ -54,7 +54,7 @@ pnpm db:migrate:remote  # リモート D1 マイグレーション
 ```
 wishlist.kurichi.dev (単一 Worker)
 ├── /api/*    → Hono REST API
-├── /rpc      → workers-mcp (ProxyToSelf)
+├── /mcp      → MCP Streamable HTTP
 ├── /health   → ヘルスチェック
 └── /*        → Static Assets (React SPA)
 ```
@@ -67,7 +67,7 @@ Frontend (React) ─┐
 Claude (MCP)    ──┘
 ```
 
-単一 Worker が REST API (/api/*)、MCP (/rpc)、静的アセット配信を担当。
+単一 Worker が REST API (/api/*)、MCP (/mcp)、静的アセット配信を担当。
 
 ### DB スキーマ管理
 
