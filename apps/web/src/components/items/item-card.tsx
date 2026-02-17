@@ -10,12 +10,15 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { ItemStatusBadge } from './item-status-badge';
 import { ItemPriorityBadge } from './item-priority-badge';
+import { ItemDesireTypeBadge } from './item-desire-type-badge';
 import { TIMEFRAME_LABELS, CATEGORY_LABELS } from '@/lib/constants';
+import { cn } from '@/lib/utils';
 
 interface ItemCardProps {
   item: WishlistItem;
   onEdit: (item: WishlistItem) => void;
   onDelete: (item: WishlistItem) => void;
+  onView: (item: WishlistItem) => void;
 }
 
 function formatCurrency(amount: number | null): string {
@@ -26,11 +29,23 @@ function formatCurrency(amount: number | null): string {
   }).format(amount);
 }
 
-export function ItemCard({ item, onEdit, onDelete }: ItemCardProps) {
+const desireTypeBorderColors: Record<string, string> = {
+  'specific-product': 'border-l-emerald-500',
+  'general-image': 'border-l-violet-500',
+  'problem-to-solve': 'border-l-amber-500',
+};
+
+export function ItemCard({ item, onEdit, onDelete, onView }: ItemCardProps) {
   return (
-    <Card>
+    <Card className={cn('border-l-4', desireTypeBorderColors[item.desireType])}>
       <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
-        <CardTitle className="text-base font-medium">{item.name}</CardTitle>
+        <button
+          type="button"
+          className="text-left cursor-pointer"
+          onClick={() => onView(item)}
+        >
+          <CardTitle className="text-base font-medium hover:underline">{item.name}</CardTitle>
+        </button>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0">
@@ -62,7 +77,8 @@ export function ItemCard({ item, onEdit, onDelete }: ItemCardProps) {
           </span>
           <span className="font-medium">{formatCurrency(item.budget)}</span>
         </div>
-        <div className="mt-2 flex items-center gap-2">
+        <div className="mt-2 flex flex-wrap items-center gap-2">
+          <ItemDesireTypeBadge desireType={item.desireType} />
           <ItemPriorityBadge priority={item.priority} />
           <ItemStatusBadge status={item.status} />
         </div>

@@ -7,7 +7,8 @@ export const createItemSchema = z.object({
   budget: z.number().int().nonnegative().nullable().optional(),
   priority: z.enum(['high', 'medium', 'low']),
   status: z.enum(['unstarted', 'considering', 'purchased']).optional(),
-  memo: z.string().max(2000).nullable().optional(),
+  desireType: z.enum(['specific-product', 'general-image', 'problem-to-solve']).optional(),
+  memo: z.string().max(10000).nullable().optional(),
 });
 
 export const updateItemSchema = createItemSchema.partial();

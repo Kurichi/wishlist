@@ -8,3 +8,4 @@ export type Timeframe = WishlistItem['timeframe'];
 export type Category = WishlistItem['category'];
 export type Priority = WishlistItem['priority'];
 export type Status = WishlistItem['status'];
+export type DesireType = WishlistItem['desireType'];

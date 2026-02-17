@@ -8,9 +8,10 @@ interface ItemListProps {
   isLoading: boolean;
   onEdit: (item: WishlistItem) => void;
   onDelete: (item: WishlistItem) => void;
+  onView: (item: WishlistItem) => void;
 }
 
-export function ItemList({ items, isLoading, onEdit, onDelete }: ItemListProps) {
+export function ItemList({ items, isLoading, onEdit, onDelete, onView }: ItemListProps) {
   if (isLoading) {
     return (
       <>
@@ -34,7 +35,7 @@ export function ItemList({ items, isLoading, onEdit, onDelete }: ItemListProps) 
     <>
       {/* Desktop: Table view */}
       <div className="hidden md:block">
-        <ItemTable items={items} onEdit={onEdit} onDelete={onDelete} />
+        <ItemTable items={items} onEdit={onEdit} onDelete={onDelete} onView={onView} />
       </div>
 
       {/* Mobile: Card view */}
@@ -50,6 +51,7 @@ export function ItemList({ items, isLoading, onEdit, onDelete }: ItemListProps) 
               item={item}
               onEdit={onEdit}
               onDelete={onDelete}
+              onView={onView}
             />
           ))
         )}

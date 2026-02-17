@@ -11,6 +11,7 @@ export function useFilters() {
       category: searchParams.get('category') || undefined,
       status: searchParams.get('status') || undefined,
       priority: searchParams.get('priority') || undefined,
+      desireType: searchParams.get('desireType') || undefined,
       sort: searchParams.get('sort') || undefined,
       order: searchParams.get('order') || undefined,
     }),

@@ -1,7 +1,7 @@
 import { eq, asc, desc, and, sql } from 'drizzle-orm';
 import type { Database } from './db/index.js';
 import { wishlistItems } from './db/schema.js';
-import type { WishlistItem, Timeframe, Category, Status, Priority } from './types.js';
+import type { WishlistItem, Timeframe, Category, Status, Priority, DesireType } from './types.js';
 import { generateId } from './id.js';
 import { NotFoundError } from './errors.js';
 import type { z } from 'zod';
@@ -15,6 +15,7 @@ export interface ListFilters {
   category?: Category;
   status?: Status;
   priority?: Priority;
+  desireType?: DesireType;
   sort?: 'name' | 'createdAt' | 'updatedAt' | 'budget' | 'priority';
   order?: 'asc' | 'desc';
 }
@@ -26,6 +27,7 @@ interface SummaryResult {
   byCategory: Record<string, { count: number; budget: number }>;
   byStatus: Record<string, { count: number; budget: number }>;
   byPriority: Record<string, { count: number; budget: number }>;
+  byDesireType: Record<string, { count: number; budget: number }>;
 }
 
 const sortColumnMap = {
@@ -53,6 +55,9 @@ export class WishlistRepository {
     }
     if (filters?.priority) {
       conditions.push(eq(wishlistItems.priority, filters.priority));
+    }
+    if (filters?.desireType) {
+      conditions.push(eq(wishlistItems.desireType, filters.desireType));
     }
 
     const sortKey = filters?.sort ?? 'createdAt';
@@ -88,6 +93,7 @@ export class WishlistRepository {
       budget: data.budget ?? null,
       priority: data.priority,
       status: data.status ?? 'unstarted',
+      desireType: data.desireType ?? 'general-image',
       memo: data.memo ?? null,
       createdAt: now,
       updatedAt: now,
@@ -132,6 +138,7 @@ export class WishlistRepository {
       byCategory: {},
       byStatus: {},
       byPriority: {},
+      byDesireType: {},
     };
 
     for (const item of items) {
@@ -165,6 +172,13 @@ export class WishlistRepository {
       }
       result.byPriority[item.priority].count++;
       result.byPriority[item.priority].budget += budget;
+
+      // byDesireType
+      if (!result.byDesireType[item.desireType]) {
+        result.byDesireType[item.desireType] = { count: 0, budget: 0 };
+      }
+      result.byDesireType[item.desireType].count++;
+      result.byDesireType[item.desireType].budget += budget;
     }
 
     return result;

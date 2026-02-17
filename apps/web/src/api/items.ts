@@ -14,6 +14,7 @@ export interface ItemFilters {
   category?: string;
   status?: string;
   priority?: string;
+  desireType?: string;
   sort?: string;
   order?: string;
 }

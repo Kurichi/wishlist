@@ -1,0 +1,1 @@
+ALTER TABLE `wishlist_items` ADD `desire_type` text DEFAULT 'general-image' NOT NULL;
