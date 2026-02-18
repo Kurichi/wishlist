@@ -73,11 +73,24 @@ export function renderAuthorizePage(
 </body>
 </html>`;
 
+  // リダイレクト先オリジンをCSP form-actionに追加（Chromeの302リダイレクトCSPチェック対策）
+  let formAction = "'self'";
+  try {
+    const redirectUrl = new URL(oauthReqInfo.redirectUri);
+    // CSPに埋め込む前にスキームを検証（defense-in-depth）
+    if (redirectUrl.protocol === "https:" || redirectUrl.protocol === "http:") {
+      formAction = `'self' ${redirectUrl.origin}`;
+    }
+  } catch {
+    // 不正なURIの場合は'self'のみ（POSTハンドラでバリデーションされる）
+  }
+
   return new Response(html, {
     headers: {
       "Content-Type": "text/html; charset=utf-8",
-      "Content-Security-Policy":
-        "default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'",
+      "Cache-Control": "no-store, max-age=0",
+      "Referrer-Policy": "no-referrer",
+      "Content-Security-Policy": `default-src 'none'; style-src 'unsafe-inline'; form-action ${formAction}; frame-ancestors 'none'; base-uri 'none'`,
     },
   });
 }
